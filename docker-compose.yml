@@ -2,10 +2,10 @@ version: '27.2.0'
 
 services:
   apache2:
-    image: apache2-app # This is the image you built earlier
-    container_name: apache2-container
+    image: apache5-app # This is the image you built earlier
+    container_name: apache5-container
     ports:
-      - "8090:80" # Map port 8080 on host to port 80 inside the container
+      - "8040:80" # Map port 8080 on host to port 80 inside the container
     volumes:
       - ./index.html:/usr/local/apache2/htdocs/index.html # Mount your local index.html file
     restart: unless-stopped # Restart policy for the container
