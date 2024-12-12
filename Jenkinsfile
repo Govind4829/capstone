@@ -37,29 +37,29 @@ pipeline {
             }
         }
 
-        stage('Push Docker Image to Docker Hub (Prod)') {
-            when {
-                branch 'master'
-            }
-            steps {
-                script {
-                    // Log in to Docker Hub
-                    docker.withRegistry('https://hub.docker.com', "$DOCKER_CREDENTIALS") {
+  //      stage('Push Docker Image to Docker Hub (Prod)') {
+  //          when {
+  //              branch 'master'
+  //          }
+  //          steps {
+  //              script {
+  //                  // Log in to Docker Hub
+  //                  docker.withRegistry('https://hub.docker.com', "$DOCKER_CREDENTIALS") {
                         // Push the image to the prod repository
                         docker.image("$DOCKER_IMAGE:$BUILD_ID").push('prod')
-                    }
-                }
-            }
-        }
+  //                  }
+  //              }
+  //          }
+  //      }
 
         stage('Deploy to Docker Host') {
             steps {
                 script {
                     // Deploy the container (stop and remove any running container with the same name)
-                    sh 'docker ps -q --filter "apache5-app" | xargs -r docker stop | xargs -r docker rm -f'
+                    //sh 'docker ps -q --filter "apache5-app" | xargs -r docker stop | xargs -r docker rm'
                     
                     // Run the container from the pushed image
-                    sh 'docker run -d --name apache5-app -p 8040:80 $DOCKER_IMAGE:$BUILD_ID'
+                    sh 'docker run -d --name apache6-app -p 8040:80 $DOCKER_IMAGE:$BUILD_ID'
                 }
             }
         }
