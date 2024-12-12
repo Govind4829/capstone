@@ -2,7 +2,7 @@
 
 # Set variables
 IMAGE_NAME="praticeuser/dev"  # Replace with your Docker image name
-TAG="latest"  # Replace with the image tag (e.g., 'prod', 'latest', etc.)
+TAG="18"  # Replace with the image tag (e.g., 'prod', 'latest', etc.)
 CONTAINER_NAME="apache5-app"  # The name of the running Docker container
 PORT="80"  # Port to expose from the container
 NEW_PORT="8040"  # New port to expose the container
