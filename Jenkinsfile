@@ -59,7 +59,7 @@ pipeline {
                     //sh 'docker ps -q --filter "apache5-app" | xargs -r docker stop | xargs -r docker rm'
                     
                     // Run the container from the pushed image
-                    sh 'docker run -d --name apache6-app -p 8040:80 $DOCKER_IMAGE:$BUILD_ID'
+                    sh 'docker run -d --name apache6-app -p 8030:80 $DOCKER_IMAGE:$BUILD_ID'
                 }
             }
         }
