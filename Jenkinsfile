@@ -31,7 +31,7 @@ pipeline {
                     // Log in to Docker Hub
                     docker.withRegistry('https://hub.docker.com', "$DOCKER_CREDENTIALS") {
                         // Push the image to the dev repository
-                        docker.image("$DOCKER_IMAGE:$BUILD_ID").push('dev')
+                        docker.image("$DOCKER_IMAGE:$BUILD_ID").push('praticeuser/dev')
                     }
                 }
             }
