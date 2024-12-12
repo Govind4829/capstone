@@ -56,7 +56,7 @@ pipeline {
             steps {
                 script {
                     // Deploy the container (stop and remove any running container with the same name)
-                    //sh 'docker ps -q --filter "name=my-container" | xargs -r docker stop | xargs -r docker rm'
+                    sh 'docker ps -q --filter "apache5-app" | xargs -r docker stop | xargs -r docker rm'
                     
                     // Run the container from the pushed image
                     sh 'docker run -d --name apache5-app -p 8040:80 $DOCKER_IMAGE:$BUILD_ID'
