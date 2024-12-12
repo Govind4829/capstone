@@ -46,7 +46,7 @@ pipeline {
   //                  // Log in to Docker Hub
   //                  docker.withRegistry('https://hub.docker.com', "$DOCKER_CREDENTIALS") {
                         // Push the image to the prod repository
-                        docker.image("$DOCKER_IMAGE:$BUILD_ID").push('prod')
+   //                     docker.image("$DOCKER_IMAGE:$BUILD_ID").push('prod')
   //                  }
   //              }
   //          }
