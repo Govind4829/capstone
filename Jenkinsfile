@@ -1,65 +1,64 @@
 pipeline {
     agent any
+    parameters {
+        choice(name: 'Environment', choices: ['dev', 'master'], description: 'Select Environment')
+        string(name: 'ImageTag', defaultValue: 'latest', description: 'Tag for the Docker image')
+    }
     environment {
-        DOCKER_HUB_DEV = 'praticeuser/dev'
-        DOCKER_HUB_PROD = 'praticeuser/prod'
-        DOCKER_IMAGE = 'apache5-app'
-        DOCKER_CREDENTIALS = 'Docker'
+        DOCKER_IMAGE = 'apache24-app'  // Your Docker image name
+        DOCKER_CREDENTIALS = 'Docker'  // Docker Hub credentials ID
     }
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'dev', url: 'https://github.com/Govind4829/capstone.git'
+                script {
+                    echo "Selected Environment: ${params.Environment}"  // Checking the parameter value
+                    echo "Using Image Tag: ${params.ImageTag}"  // Displaying the image tag
+                }
+                git branch: params.Environment, url: 'https://github.com/Govind4829/capstone.git'
             }
         }
 
         stage('Build Docker Image') {
             steps {
                 script {
-                    // Building the Docker image
-                    docker.build("$DOCKER_IMAGE:$BUILD_ID")
+                    docker.build("${DOCKER_IMAGE}:${params.ImageTag}")
                 }
             }
         }
 
-        stage('Push Docker Image to Docker Hub (Dev)') {
-            when {
-                branch 'dev'
-            }
+        stage('Run Docker Container') {
             steps {
                 script {
-                    // Log in to Docker Hub
-                    docker.withRegistry('https://hub.docker.com', "$DOCKER_CREDENTIALS") {
-                        // Push the image to the dev repository
-                        docker.image("$DOCKER_IMAGE:$BUILD_ID").push('praticeuser/dev')
-                    }
-                }
-            }
-        }
-
-  //      stage('Push Docker Image to Docker Hub (Prod)') {
-  //          when {
-  //              branch 'master'
-  //          }
-  //          steps {
-  //              script {
-  //                  // Log in to Docker Hub
-  //                  docker.withRegistry('https://hub.docker.com', "$DOCKER_CREDENTIALS") {
-                        // Push the image to the prod repository
-   //                     docker.image("$DOCKER_IMAGE:$BUILD_ID").push('prod')
-  //                  }
-  //              }
-  //          }
-  //      }
-
-        stage('Deploy to Docker Host') {
-            steps {
-                script {
-                    // Deploy the container (stop and remove any running container with the same name)
-                    //sh 'docker ps -q --filter "apache5-app" | xargs -r docker stop | xargs -r docker rm'
+                    // Stop and remove any existing container with the same name
+                    sh '''
+                    if [ $(docker ps -aq -f name=${DOCKER_IMAGE}) ]; then
+                        echo "Stopping and removing existing container..."
+                        docker stop ${DOCKER_IMAGE}
+                        docker rm ${DOCKER_IMAGE}
+                    fi
+                    '''
                     
-                    // Run the container from the pushed image
-                    sh 'docker run -d --name apache7-app -p 8030:80 $DOCKER_IMAGE:$BUILD_ID'
+                    // Run the new container from the built image
+                    sh "docker run -d --name ${DOCKER_IMAGE} -p 8236:80 ${DOCKER_IMAGE}:${params.ImageTag}"
+                }
+            }
+        }
+
+        stage('Push Docker Image to Docker Hub') {
+            steps {
+                script {
+                    // Determine the repository and tag to use based on the environment and image tag
+                    def repoTag = "${params.Environment}:${params.ImageTag}"
+                    echo "Pushing Docker image to Docker Hub (Repository: $repoTag)"
+                    
+                    // Tag the image with the appropriate environment and image tag
+                    sh "docker tag ${DOCKER_IMAGE}:${params.ImageTag} praticeuser/${params.Environment}:${params.ImageTag}"
+                    
+                    // Push the image to the selected repository (dev or master)
+                    withDockerRegistry([credentialsId: DOCKER_CREDENTIALS]) {
+                        sh "docker push praticeuser/${params.Environment}:${params.ImageTag}"
+                    }
                 }
             }
         }
@@ -67,10 +66,10 @@ pipeline {
 
     post {
         success {
-            echo 'Build and Push Successful!'
+            echo 'Build, Run, and Push Successful!'
         }
         failure {
-            echo 'Build or Push Failed!'
+            echo 'Build, Run, or Push Failed!'
         }
     }
 }
