@@ -3,9 +3,9 @@
 # Set variables
 IMAGE_NAME="praticeuser/dev"  # Replace with your Docker image name
 TAG="18"  # Replace with the image tag (e.g., 'prod', 'latest', etc.)
-CONTAINER_NAME="apache5-app"  # The name of the running Docker container
+CONTAINER_NAME="apache24-app"  # The name of the running Docker container
 PORT="80"  # Port to expose from the container
-NEW_PORT="8040"  # New port to expose the container
+NEW_PORT="8236"  # New port to expose the container
 
 # Step 1: Ensure Docker is installed
 
